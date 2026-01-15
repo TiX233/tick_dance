@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,PY32F030x8</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Drivers\CMSIS\Include;..\Drivers\PY32F0xx_HAL_Driver\Inc;..\Drivers\BSP\PY32F030xx_Start_Kit;..\Inc;..\Drivers\CMSIS\Device\PY32F0xx\Include</IncludePath>
+              <IncludePath>..\Drivers\CMSIS\Include;..\Drivers\PY32F0xx_HAL_Driver\Inc;..\Drivers\BSP\PY32F030xx_Start_Kit;..\Inc;..\Drivers\CMSIS\Device\PY32F0xx\Include;..\ltx\inc;..\ltx\components\app;..\ltx\components\debug;..\ltx\components\event_group;..\ltx\components\lock;..\ltx\components\log;..\ltx\components\script</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -414,6 +414,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\py32f0xx_it.c</FilePath>
             </File>
+            <File>
+              <FileName>myAPP_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\myAPP_system.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -463,6 +468,61 @@
               <FileName>py32f0xx_hal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Drivers\PY32F0xx_HAL_Driver\Src\py32f0xx_hal.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ltx</GroupName>
+          <Files>
+            <File>
+              <FileName>ltx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\src\ltx.c</FilePath>
+            </File>
+            <File>
+              <FileName>ltx_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\app\ltx_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>ltx_cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\debug\ltx_cmd.c</FilePath>
+            </File>
+            <File>
+              <FileName>ltx_param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\debug\ltx_param.c</FilePath>
+            </File>
+            <File>
+              <FileName>ltx_event_group.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\event_group\ltx_event_group.c</FilePath>
+            </File>
+            <File>
+              <FileName>ltx_lock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\lock\ltx_lock.c</FilePath>
+            </File>
+            <File>
+              <FileName>ltx_log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\log\ltx_log.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\log\SEGGER_RTT.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT_printf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\log\SEGGER_RTT_printf.c</FilePath>
+            </File>
+            <File>
+              <FileName>ltx_script.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ltx\components\script\ltx_script.c</FilePath>
             </File>
           </Files>
         </Group>

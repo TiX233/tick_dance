@@ -45,11 +45,8 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
 /* Exported variables prototypes ---------------------------------------------*/
-extern DMA_HandleTypeDef HdmaCh1;
-extern DMA_HandleTypeDef HdmaCh2;
-extern DMA_HandleTypeDef HdmaCh3;
-extern SPI_HandleTypeDef Spi1Handle;
-extern uint8_t DmaOnFlag, DmaTxRxFlag;
+extern SPI_HandleTypeDef hspi1_handler;
+extern DMA_HandleTypeDef hdmaCh1_handler;
 
 /* Exported functions prototypes ---------------------------------------------*/
 void APP_ErrorHandler(void);
