@@ -5,6 +5,8 @@
 #include "ltx_app.h"
 #include "myAPP_system.h"
 #include "ltx_log.h"
+#include "ST7305.h"
+#include "myAPP_device_init.h"
 
 typedef struct {
     const char *cmd_name;
@@ -20,6 +22,9 @@ void cmd_cb_alarm(uint8_t argc, char *argv[]);
 void cmd_cb_reboot(uint8_t argc, char *argv[]);
 void cmd_cb_param(uint8_t argc, char *argv[]);
 void cmd_cb_ltx_app(uint8_t argc, char *argv[]);
+
+void cmd_cb_fill_unit(uint8_t argc, char *argv[]);
+void cmd_cb_draw_unit(uint8_t argc, char *argv[]);
 
 ltx_Cmd_item cmd_list[] = {
     {
@@ -66,6 +71,19 @@ ltx_Cmd_item cmd_list[] = {
         .cmd_name = "ltx_app",
         .brief = "manage ltx apps",
         .cmd_cb = cmd_cb_ltx_app,
+    },
+
+    
+    {
+        .cmd_name = "fill_unit",
+        .brief = "fill 1 unit to a color",
+        .cmd_cb = cmd_cb_fill_unit,
+    },
+    
+    {
+        .cmd_name = "draw_unit",
+        .brief = "draw 1 unit to param you provide",
+        .cmd_cb = cmd_cb_draw_unit,
     },
 
 
@@ -562,4 +580,63 @@ void ltx_Cmd_process(char *cmd){
 
     LTX_LOG_WARN("Unknown cmd: %s\n", argv[0]);
     LTX_LOG_INFO("Type /help to list all commands\n");
+}
+
+
+// 将某个 unit 绘制为单色块，阻塞
+void cmd_cb_fill_unit(uint8_t argc, char *argv[]){
+    if(argc < 4){
+        goto Useage_fill_unit;
+    }
+
+    uint8_t unit_x, unit_y, color;
+    sscanf(argv[1], "%d", &unit_x);
+    sscanf(argv[2], "%d", &unit_y);
+    sscanf(argv[3], "%d", &color);
+
+    if(unit_x > 10 || unit_y > 124){
+        LTX_LOG_WARN("unit not in range!\n");
+        
+        goto Useage_fill_unit;
+    }
+
+    st7305_fill_unit(&myLCD, unit_x, unit_y, 1, 1, color);
+
+    LTX_LOG_INFO("Fill %d %d to %d over\n", unit_x, unit_y, color);
+
+    return ;
+
+Useage_fill_unit:
+    LTX_LOG_INFO("Useage: %s <unit_x(0~10)> <unit_y(0~124)> <color(0/1)>\n", argv[0]);
+}
+
+// 将某个 unit 绘制为传入的三个字节的参数，阻塞
+void cmd_cb_draw_unit(uint8_t argc, char *argv[]){
+    if(argc < 6){
+        goto Useage_draw_unit;
+    }
+
+    uint8_t unit_x, unit_y;
+    uint8_t draw_buf[3];
+    sscanf(argv[1], "%d", &unit_x);
+    sscanf(argv[2], "%d", &unit_y);
+    sscanf(argv[3], "%x", draw_buf);
+    sscanf(argv[4], "%x", draw_buf+1);
+    sscanf(argv[5], "%x", draw_buf+2);
+
+    if(unit_x > 10 || unit_y > 124){
+        LTX_LOG_WARN("unit not in range!\n");
+        
+        goto Useage_draw_unit;
+    }
+
+    st7305_draw_unit(&myLCD, unit_x, unit_y, draw_buf);
+
+    LTX_LOG_INFO("Draw %d %d to 0x%x 0x%x 0x%x over\n", unit_x, unit_y, draw_buf[0], draw_buf[1], draw_buf[2]);
+
+    return ;
+
+Useage_draw_unit:
+    LTX_LOG_INFO("Useage: %s <unit_x(0~10)> <unit_y(0~124)> <buf1(hex)> <buf2(hex)> <buf3(hex)>\n", argv[0]);
+
 }

@@ -33,6 +33,7 @@
 #include "ltx_log.h"
 #include "ltx_app.h"
 #include "myAPP_system.h"
+#include "myAPP_device_init.h"
 
 /* Private define ------------------------------------------------------------*/
 
@@ -69,8 +70,8 @@ int main(void)
     ltx_App_resume(&app_system);
     
     // 创建外部硬件初始化 app 并运行
-    // ltx_App_init(&app_device_init);
-    // ltx_App_resume(&app_device_init);
+    ltx_App_init(&app_device_init);
+    ltx_App_resume(&app_device_init);
 
 
     // 启动调度器

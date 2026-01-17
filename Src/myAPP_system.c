@@ -4,7 +4,6 @@
 #include "ltx_param.h"
 #include "ltx_log.h"
 #include "ltx_cmd.h"
-// #include "GC9A01.h"
 
 void task_func_heart_beat(void *param);
 void task_func_cmd(void *param);
@@ -29,7 +28,7 @@ struct ltx_Topic_stu topic_sys_error = _LTX_TOPIC_DEAFULT_CONFIG(topic_sys_error
 struct ltx_Topic_subscriber_stu subscriber_sys_error = _LTX_SUBSCRIBER_DEAFULT_CONFIG(subscriber_cb_sys_error);
 
 // 错误码周期打印任务
-struct ltx_Task_stu task_error_code;
+struct ltx_Task_stu task_error_code = {.is_initialized = 0};
 
 int myApp_system_init(struct ltx_App_stu *app){
     // 创建心拍周期任务
@@ -123,11 +122,12 @@ void task_func_error_code(void *param){
 void subscriber_cb_sys_error(void *param){
     // 系统发生错误
     // 创建一个不断打印错误码的任务
-    ltx_Task_init(&task_error_code, task_func_error_code, 1000, 1000);
-    ltx_Task_add_to_app(&task_error_code, &app_system, "error_code");
-
-    // 运行
-    ltx_Task_resume(&task_error_code);
+    if(!task_error_code.is_initialized){
+        ltx_Task_init(&task_error_code, task_func_error_code, 1000, 1000);
+        ltx_Task_add_to_app(&task_error_code, &app_system, "error_code");
+        // 运行
+        ltx_Task_resume(&task_error_code);
+    }
 
     // 关闭其他 app
     // todo

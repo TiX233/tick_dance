@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,PY32F030x8</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Drivers\CMSIS\Include;..\Drivers\PY32F0xx_HAL_Driver\Inc;..\Drivers\BSP\PY32F030xx_Start_Kit;..\Inc;..\Drivers\CMSIS\Device\PY32F0xx\Include;..\ltx\inc;..\ltx\components\app;..\ltx\components\debug;..\ltx\components\event_group;..\ltx\components\lock;..\ltx\components\log;..\ltx\components\script</IncludePath>
+              <IncludePath>..\Drivers\CMSIS\Include;..\Drivers\PY32F0xx_HAL_Driver\Inc;..\Drivers\BSP\PY32F030xx_Start_Kit;..\Inc;..\Drivers\CMSIS\Device\PY32F0xx\Include;..\ltx\inc;..\ltx\components\app;..\ltx\components\debug;..\ltx\components\event_group;..\ltx\components\lock;..\ltx\components\log;..\ltx\components\script;..\Devices\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -418,6 +418,11 @@
               <FileName>myAPP_system.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\myAPP_system.c</FilePath>
+            </File>
+            <File>
+              <FileName>myAPP_device_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\myAPP_device_init.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -523,6 +528,16 @@
               <FileName>ltx_script.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\ltx\components\script\ltx_script.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Devices</GroupName>
+          <Files>
+            <File>
+              <FileName>ST7305.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Devices\ST7305.c</FilePath>
             </File>
           </Files>
         </Group>

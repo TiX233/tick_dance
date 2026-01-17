@@ -40,7 +40,7 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "py32f0xx_hal.h"
 #include "stdio.h"
-#include <stdbool.h>
+#include "stdint.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
