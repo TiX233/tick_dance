@@ -48,6 +48,8 @@ extern "C" {
 extern SPI_HandleTypeDef hspi1_handler;
 extern DMA_HandleTypeDef hdmaCh1_handler;
 
+extern RTC_HandleTypeDef hrtc_handler;
+
 /* Exported functions prototypes ---------------------------------------------*/
 void APP_ErrorHandler(void);
 

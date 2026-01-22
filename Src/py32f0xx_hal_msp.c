@@ -32,6 +32,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include "ltx_log.h"
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -162,6 +164,62 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
         HAL_DMA_DeInit(&hdmaCh1_handler);
         HAL_NVIC_DisableIRQ(DMA1_Channel1_IRQn);
     }
+}
+
+/**
+ * @brief Initialize RTC MSP
+ * @param hrtc：RTC handle
+ */
+void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
+{
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+    /* Configure LSE/LSI as RTC clock source */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+    RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+    RCC_OscInitStruct.LSEDriver = RCC_LSEDRIVE_MEDIUM;
+    RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+    {
+        while(1){
+            LTX_LOG_ERRO("Config osc to LSE Failed!\n");
+            HAL_Delay(1000);
+        }
+    }
+
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+    PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+        while(1){
+            LTX_LOG_ERRO("Config rtc Failed!\n");
+            HAL_Delay(1000);
+        }
+    }
+
+    /* Enable RTC peripheral clock */
+    __HAL_RCC_RTCAPB_CLK_ENABLE();
+    /* Enable RTC clock */
+    __HAL_RCC_RTC_ENABLE();
+
+    /* Configure NVIC for RTC interrupts */
+    // HAL_NVIC_SetPriority(RTC_IRQn, 0, 0);
+    // HAL_NVIC_EnableIRQ(RTC_IRQn);
+
+    // __HAL_RTC_OVERFLOW_ENABLE_IT(hrtc, RTC_IT_OW);
+    // __HAL_RTC_SECOND_ENABLE_IT(hrtc, RTC_IT_SEC);
+}
+
+/**
+ * @brief Deinitialize RTC MSP
+ * @param hrtc：RTC handle
+ */
+void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
+{
+    /*##-1- Reset peripherals ##################################################*/
+    __HAL_RCC_RTC_DISABLE();
 }
 
 /************************ (C) COPYRIGHT Puya *****END OF FILE******************/

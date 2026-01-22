@@ -15,11 +15,15 @@ void task_cb_tick_dance(void *param);
 struct ltx_Topic_stu *topic_time_need_dance = &(task_tick_dance.timer.topic); // 不额外创建话题，直接用 task 自己的 topic
 
 // 单帧发送完成话题
-struct ltx_Topic_stu topic_draw_frame_over = _LTX_TOPIC_DEAFULT_CONFIG(topic_draw_frame_over);
+// struct ltx_Topic_stu topic_draw_frame_over = _LTX_TOPIC_DEAFULT_CONFIG(topic_draw_frame_over);
+
+// 显示管理脚本
+struct ltx_Script_stu script_display_manager;
+void script_cb_display_manager(struct ltx_Script_stu *script);
 
 // 时间显示脚本
-struct ltx_Script_stu script_time_display;
-void script_cb_time_display(struct ltx_Script_stu *script);
+struct ltx_Script_stu script_display_time;
+void script_cb_display_time(struct ltx_Script_stu *script);
 
 // APP 相关
 int myAPP_display_init(struct ltx_App_stu *app){
@@ -28,29 +32,31 @@ int myAPP_display_init(struct ltx_App_stu *app){
     ltx_Task_add_to_app(&task_cb_tick_dance, app, "tick_dance");
 
 
-    // 创建时间跳动脚本
-    ltx_Script_init(&script_time_display, script_cb_time_display, 0);
+    // 创建显示管理脚本
+    ltx_Script_init(&script_display_manager, script_cb_display_manager, 0);
+    // 创建时间显示脚本
+    ltx_Script_init(&script_display_time, script_cb_display_time, 0);
     
     return 0;
 }
 
 int myAPP_display_pause(struct ltx_App_stu *app){
 
-    ltx_Script_pause(&script_time_display);
+    ltx_Script_pause(&script_display_manager);
 
     return 0;
 }
 
 int myAPP_display_resume(struct ltx_App_stu *app){
 
-    ltx_Script_resume(&script_time_display);
+    ltx_Script_resume(&script_display_manager);
 
     return 0;
 }
 
 int myAPP_display_destroy(struct ltx_App_stu *app){
 
-    ltx_Script_pause(&script_time_display);
+    ltx_Script_pause(&script_display_manager);
 
     // free...
 
@@ -83,15 +89,72 @@ void task_cb_tick_dance(void *param){
 }
 
 // 时间显示脚本
-void script_cb_time_display(struct ltx_Script_stu *script){
-    // if(ltx_Script_get_triger_type(script) == SC_TRIGER_RESET){ // 外部要求此脚本复位，可在此处做释放资源等操作
-
-    //     return ;
-    // }
+void script_cb_display_time(struct ltx_Script_stu *script){
+    if(ltx_Script_get_triger_type(script) == SC_TRIGER_RESET){ // 外部要求此脚本复位，可在此处做释放资源等操作
+        HAL_SPI_DMAStop(&hspi1_handler);
+        return ;
+    }
 
     switch(script->step_now){
         case 0:
+            ltx_Script_next_step_topic(script, script->step_now + 1, 0, topic_time_need_dance); // 以 TickType_t 最大值等待时间需要跳动定时器触发，触发后再更新显示
 
+            break;
+
+        case 1: // 显示小时十位
+            
+            ltx_Script_next_step_topic(script, script->step_now + 1, 10, &topic_spi_tx_over); // 等待刷新完成
+            break;
+
+        case 2: // 显示小时个位
+            
+            ltx_Script_next_step_topic(script, script->step_now + 1, 10, &topic_spi_tx_over); // 等待刷新完成
+            break;
+
+        case 3: // 显示左冒号
+            
+            ltx_Script_next_step_topic(script, script->step_now + 1, 10, &topic_spi_tx_over); // 等待刷新完成
+            break;
+
+        case 4: // 显示分钟十位
+            
+            ltx_Script_next_step_topic(script, script->step_now + 1, 10, &topic_spi_tx_over); // 等待刷新完成
+            break;
+
+        case 5: // 显示分钟个位
+            
+            ltx_Script_next_step_topic(script, script->step_now + 1, 10, &topic_spi_tx_over); // 等待刷新完成
+            break;
+
+        case 6: // 显示右冒号
+            
+            ltx_Script_next_step_topic(script, script->step_now + 1, 10, &topic_spi_tx_over); // 等待刷新完成
+            break;
+
+        case 7: // 显示秒十位
+            
+            ltx_Script_next_step_topic(script, script->step_now + 1, 10, &topic_spi_tx_over); // 等待刷新完成
+            break;
+
+        case 8: // 显示秒个位
+            
+            ltx_Script_next_step_topic(script, 0, 10, &topic_spi_tx_over); // 等待刷新完成，刷新完成则进入等待下次定时器触发
+            break;
+
+        default:
+
+            break;
+    }
+}
+
+// 显示管理脚本
+void script_cb_display_manager(struct ltx_Script_stu *script){
+    switch(script->step_now){
+        case 0: // 刚开机，进时间显示
+            ltx_Script_reset(&script_cb_display_time, 0);
+            ltx_Script_resume(&script_cb_display_time);
+
+            // ltx_Script_next_step_topic(script, 1, 0, &); // 等待按键切换状态
             break;
 
         default:

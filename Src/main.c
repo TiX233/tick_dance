@@ -41,11 +41,14 @@
 SPI_HandleTypeDef hspi1_handler;
 DMA_HandleTypeDef hdmaCh1_handler;
 
+RTC_HandleTypeDef hrtc_handler;
+
 /* Private user code ---------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 static void sys_clock_init(void);
 static void sys_spi1_init(void);
+static void sys_rtc_init(void);
 static void sys_button_init(void);
 
 /**
@@ -55,7 +58,7 @@ static void sys_button_init(void);
 int main(void)
 {
     ltx_Log_init();
-    LTX_LOG_INFO("\n\nSYSTEM START\n\n");
+    LTX_LOG_STR("\n\nSYSTEM START\n\n");
 
     /* Reset of all peripherals, Initializes the Systick */
     HAL_Init();
@@ -64,6 +67,10 @@ int main(void)
     sys_clock_init();
     sys_spi1_init(); // 2MHz
     sys_button_init();
+    sys_rtc_init();
+
+    LTX_LOG_DEBG("RTC source: %d\n", __HAL_RCC_GET_RTC_SOURCE());
+    
 
     // 创建系统 app 并运行
     ltx_App_init(&app_system);
@@ -121,6 +128,18 @@ static void sys_clock_init(void)
     }
 }
 
+static void sys_rtc_init(void){
+    /* RTC initialization */
+    hrtc_handler.Instance = RTC;                         /* Select RTC */
+    hrtc_handler.Init.AsynchPrediv = RTC_AUTO_1_SECOND;  /* RTC asynchronous prescaler calculated automatically for one second time base */
+    hrtc_handler.Init.OutPut = RTC_OUTPUTSOURCE_NONE;    /* No output on the TAMPER pin */
+    if (HAL_RTC_Init(&hrtc_handler) != HAL_OK){
+        while(1){
+            LTX_LOG_ERRO("RTC init Failed!\n");
+            HAL_Delay(1000);
+        }
+    }
+}
 
 static void sys_spi1_init(void){
     /*Deinitialize SPI configuration*/

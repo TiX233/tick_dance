@@ -26,6 +26,9 @@ void cmd_cb_ltx_app(uint8_t argc, char *argv[]);
 void cmd_cb_fill_unit(uint8_t argc, char *argv[]);
 void cmd_cb_draw_unit(uint8_t argc, char *argv[]);
 
+void cmd_cb_rtc_get(uint8_t argc, char *argv[]);
+void cmd_cb_rtc_set(uint8_t argc, char *argv[]);
+
 ltx_Cmd_item cmd_list[] = {
     {
         .cmd_name = "echo",
@@ -84,6 +87,18 @@ ltx_Cmd_item cmd_list[] = {
         .cmd_name = "draw_unit",
         .brief = "draw 1 unit to param you provide",
         .cmd_cb = cmd_cb_draw_unit,
+    },
+    
+    {
+        .cmd_name = "rtc_get",
+        .brief = "get rtc date and time",
+        .cmd_cb = cmd_cb_rtc_get,
+    },
+    
+    {
+        .cmd_name = "rtc_set",
+        .brief = "set rtc date and time",
+        .cmd_cb = cmd_cb_rtc_set,
     },
 
 
@@ -611,6 +626,7 @@ Useage_fill_unit:
 }
 
 // 将某个 unit 绘制为传入的三个字节的参数，阻塞
+// 会进 hf，暂时不修
 void cmd_cb_draw_unit(uint8_t argc, char *argv[]){
     if(argc < 6){
         goto Useage_draw_unit;
@@ -639,4 +655,53 @@ void cmd_cb_draw_unit(uint8_t argc, char *argv[]){
 Useage_draw_unit:
     LTX_LOG_INFO("Useage: %s <unit_x(0~10)> <unit_y(0~124)> <buf1(hex)> <buf2(hex)> <buf3(hex)>\n", argv[0]);
 
+}
+
+
+// 读取 rtc 日期与时间命令
+void cmd_cb_rtc_get(uint8_t argc, char *argv[]){
+    RTC_DateTypeDef rtc_date;
+    RTC_TimeTypeDef rtc_time;
+
+    HAL_RTC_GetDate(&hrtc_handler, &rtc_date, RTC_FORMAT_BIN);
+    HAL_RTC_GetTime(&hrtc_handler, &rtc_time, RTC_FORMAT_BIN);
+
+    LTX_LOG_DEBG("RTC source: %d\n", __HAL_RCC_GET_RTC_SOURCE());
+    LTX_LOG_DEBG("RTC LSE flag: %d\n", __HAL_RCC_GET_FLAG(RCC_FLAG_LSERDY));
+    LTX_LOG_INFO("Date: %d %d %d\n", rtc_date.Year, rtc_date.Month, rtc_date.Date);
+    LTX_LOG_INFO("Time: %d:%d:%d\n", rtc_time.Hours, rtc_time.Minutes, rtc_time.Seconds);
+}
+
+// 设置 rtc 日期或时间命令
+void cmd_cb_rtc_set(uint8_t argc, char *argv[]){
+    if(argc < 5){
+        goto Useage_rtc_set;
+    }
+
+    RTC_DateTypeDef rtc_date;
+    RTC_TimeTypeDef rtc_time;
+
+    uint8_t yh, mm, ds;
+
+    sscanf(argv[2], "%d", &yh);
+    sscanf(argv[3], "%d", &mm);
+    sscanf(argv[4], "%d", &ds);
+
+    if(argv[1][0] == 'd'){
+        rtc_date.Year = yh;
+        rtc_date.Month = mm;
+        rtc_date.Date = ds;
+        HAL_RTC_SetDate(&hrtc_handler, &rtc_date, RTC_FORMAT_BIN);
+    }else if(argv[1][0] == 't'){
+        rtc_time.Hours = yh;
+        rtc_time.Minutes = mm;
+        rtc_time.Seconds = ds;
+        HAL_RTC_SetTime(&hrtc_handler, &rtc_time, RTC_FORMAT_BIN);
+    }else {
+        goto Useage_rtc_set;
+    }
+
+    return ;
+Useage_rtc_set:
+    LTX_LOG_INFO("Useage: %s <date/time> <year/hour> <month/minute> <date/second>\n", argv[0]);
 }
