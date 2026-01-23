@@ -32,8 +32,11 @@
 #include "main.h"
 #include "ltx_log.h"
 #include "ltx_app.h"
+#include "ltx_lock.h"
+
 #include "myAPP_system.h"
 #include "myAPP_device_init.h"
+#include "myAPP_button.h"
 
 /* Private define ------------------------------------------------------------*/
 
@@ -42,6 +45,8 @@ SPI_HandleTypeDef hspi1_handler;
 DMA_HandleTypeDef hdmaCh1_handler;
 
 RTC_HandleTypeDef hrtc_handler;
+
+struct ltx_Lock_stu lock_debounce;
 
 /* Private user code ---------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -65,9 +70,13 @@ int main(void)
 
     // 外设初始化
     sys_clock_init();
-    sys_spi1_init(); // 2MHz
-    sys_button_init();
     sys_rtc_init();
+    sys_spi1_init(); // 2MHz
+
+    // 中断按键初始化
+    ltx_Lock_init(&lock_debounce, lock_cb_debounce_over);
+    sys_button_init();
+    ltx_Lock_locked(&lock_debounce, 15); // 消抖 15ms
 
     LTX_LOG_DEBG("RTC source: %d\n", __HAL_RCC_GET_RTC_SOURCE());
     
@@ -173,11 +182,27 @@ static void sys_button_init(void){
     __HAL_RCC_GPIOB_CLK_ENABLE();  /* Enable GPIOB clock */
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-    GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_6;
-    GPIO_InitStruct.Mode = GPIO_MODE_EVT_FALLING;
+    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_6;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    // /* Enable EXTI interrupt */
+    // HAL_NVIC_EnableIRQ(EXTI2_3_IRQn);
+    // /* Configure interrupt priority */
+    // HAL_NVIC_SetPriority(EXTI2_3_IRQn, 0, 0);
+
+    /* Enable EXTI interrupt */
+    HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+    /* Configure interrupt priority */
+    HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
 }
 
 /**

@@ -50,6 +50,8 @@ extern DMA_HandleTypeDef hdmaCh1_handler;
 
 extern RTC_HandleTypeDef hrtc_handler;
 
+extern struct ltx_Lock_stu lock_debounce;
+
 /* Exported functions prototypes ---------------------------------------------*/
 void APP_ErrorHandler(void);
 

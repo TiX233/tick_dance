@@ -8,6 +8,7 @@
 #include "ST7305.h"
 #include "myAPP_system.h"
 #include "myAPP_display.h"
+#include "myAPP_button.h"
 
 // 所需初始化外部硬件完成事件
 #define EVENT_INIT_LCD_OVER         0x0001
@@ -355,10 +356,15 @@ void script_cb_draw_logo(struct ltx_Script_stu *script){
             // logo 绘制完成
             // 结束脚本
             ltx_Script_next_step_over(script);
+
             // 启动业务 app
             // 启动显示 app
             ltx_App_init(&app_display);
             ltx_App_resume(&app_display);
+
+            // 启动按键 app
+            ltx_App_init(&app_button);
+            ltx_App_resume(&app_button);
 
             break;
     }

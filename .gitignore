@@ -31,3 +31,4 @@ JLinkLog.txt
 *.sct
 *.hex
 *.bin
+*.dis
