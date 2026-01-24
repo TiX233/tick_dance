@@ -118,16 +118,26 @@ void script_cb_display_time(struct ltx_Script_stu *script){
 
     if(ltx_Script_get_triger_type(script) == SC_TRIGER_RESET){ // 外部要求此脚本复位，可在此处做释放资源等操作
         HAL_SPI_DMAStop(&hspi1_handler);
+        // st7305_power_high(&myLCD); // 显示屏进高功耗，提高刷新率
         return ;
     }
 
     switch(script->step_now){
         case 0:
-            ltx_Script_next_step_topic(script, script->step_now + 1, 0, topic_time_need_dance); // 以 TickType_t 最大值等待时间需要跳动定时器触发，触发后再更新显示
+            st7305_power_low(&myLCD); // 显示屏进低功耗，降低刷新率
+            ltx_Script_next_step_topic(script, 20, 0, topic_time_need_dance); // 以 TickType_t 最大值等待时间需要跳动定时器触发，触发后再更新显示
+
+            break;
+
+        case 20:
+            st7305_power_high(&myLCD); // 显示屏进高功耗，提高刷新率
+            ltx_Script_next_step_delay(script, 1, 50); // 进高功耗后等一段时间再开始刷屏
 
             break;
 
         case 1: // 显示小时十位
+            st7305_power_high(&myLCD); // 显示屏进高功耗，提高刷新率
+
             HAL_RTC_GetTime(&hrtc_handler, &rtc_time, RTC_FORMAT_BIN);
 
             st7305_set_unit_window(&myLCD, 2, 4, 9, 20);

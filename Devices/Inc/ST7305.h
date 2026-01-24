@@ -100,6 +100,9 @@ void st7305_write_data(struct st7305_stu *lcd, const uint8_t *data, uint16_t len
 uint8_t st7305_write_data_dma(struct st7305_stu *lcd, const uint8_t *data, uint16_t len);
 void st7305_set_unit_window(struct st7305_stu *lcd, uint16_t unit_x0, uint16_t unit_y0, uint16_t unit_x1, uint16_t unit_y1);
 
+void st7305_power_high(struct st7305_stu *lcd);
+void st7305_power_low(struct st7305_stu *lcd);
+
 #ifdef ST7305_NEED_FULL_BUFFER
 void st7305_buf_draw_pix(struct st7305_stu *lcd, uint16_t x, uint16_t y, uint8_t color);
 void st7305_buf_refresh(struct st7305_stu *lcd);

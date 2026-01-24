@@ -91,10 +91,17 @@ int main(void)
 
 
     // 启动调度器
+    #ifndef USE_IDLE_SLEEP
     LTX_LOG_INFO("Start scheduler...\n");
     ltx_Sys_scheduler();
+    #endif
+    // 开启空闲休眠，调度器放到 pendsv
 
-    while (1);
+    LTX_LOG_INFO("Start idle task...\n");
+    while (1){
+        // 进入休眠
+        __WFI();
+    }
 }
 
 /**

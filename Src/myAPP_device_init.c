@@ -349,7 +349,7 @@ void script_cb_draw_logo(struct ltx_Script_stu *script){
             st7305_set_unit_window(&myLCD, x_x, x_y, x_x + x_w - 1, x_y + x_h - 1);
             st7305_write_data_dma(&myLCD, x_char_buffer, 504); // 1 个 unit 3 个字节
 
-            ltx_Script_next_step_delay(script, script->step_now + 1, 300); // logo 停留一段时间
+            ltx_Script_next_step_delay(script, script->step_now + 1, 500); // logo 停留一段时间
             break;
 
         default:

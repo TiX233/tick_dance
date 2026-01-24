@@ -169,6 +169,8 @@ void SVC_Handler(void)
  */
 void PendSV_Handler(void)
 {
+    // 运行调度器
+    ltx_Sys_scheduler();
 }
 
 /**

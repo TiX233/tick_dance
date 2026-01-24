@@ -146,13 +146,15 @@ lcd_init_seq_stu st7305_init_table[] = {
     {LCD_CTRL_WRITE_DATA, 4, (const uint8_t []){0x37, 0x35, 0x37, 0x37}},
 // 电压设置 结束
 
-    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xD8}}, // HPM=32Hz
-    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0XA6}},
-    {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X80, 0XE9}},
+    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xD8}},
+    // {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X80, 0XE9}}, // HPM=51Hz
+    {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0XA6, 0XE9}}, // HPM=32Hz
+    // {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X26, 0XE9}}, // 关闭 osc
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xB2}}, // Frame Rate Control
     // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X15}}, //
-    {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X02}}, //
+    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X05}}, // 高功耗下 16/25.5 Hz，低功耗下 8Hz
+    {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X00}}, // 高功耗下 16/25.5 Hz，低功耗下 0.25Hz
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xB3}}, // Update Period Gate EQ Control in HPM
     {LCD_CTRL_WRITE_DATA, 10, (const uint8_t []){0XE5, 0XF6, 0X17, 0X77, 0X77, 0X77, 0X77, 0X77, 0X77, 0X71}}, //
@@ -204,8 +206,8 @@ lcd_init_seq_stu st7305_init_table[] = {
     {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0XFF}}, //
 
 
-    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x39}}, // 0x39 low power 0x38 high power
-    // {LCD_CTRL_DELAY, 20}, // 延时 20 ms
+    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x38}}, // 0x39 low power 0x38 high power
+    {LCD_CTRL_DELAY, 20}, // 延时 20 ms
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xBB}},
     {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0x4F}},
@@ -218,9 +220,9 @@ lcd_init_seq_stu st7305_init_table[] = {
     // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0x41}},
     // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0x26}},
 
-    {LCD_CTRL_DELAY, 2}, // 延时 2 ms
-    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x38}}, // 0x39 low power 0x38 high power
-    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x29}}, // DISPLAY ON
+    // {LCD_CTRL_DELAY, 2}, // 延时 2 ms
+    // {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x38}}, // 0x39 low power 0x38 high power
+    // {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x29}}, // DISPLAY ON
 
     // 初始化结束
     {LCD_CTRL_OVER, },
@@ -378,6 +380,16 @@ void st7305_clear(struct st7305_stu *lcd, uint8_t color){
     st7305_fill_unit(lcd, 0, 0, LCD_UNIT_WIDTH, LCD_UNIT_HEIGHT, color);
 }
 
+
+void st7305_power_high(struct st7305_stu *lcd){
+    st7305_write_cmd(lcd, 0x38);
+    // st7305_write_cmd(lcd, 0x11);
+}
+
+void st7305_power_low(struct st7305_stu *lcd){
+    st7305_write_cmd(lcd, 0x39);
+    // st7305_write_cmd(lcd, 0x10);
+}
 
 // 以下是开启了全屏缓存所支持的函数
 #ifdef ST7305_NEED_FULL_BUFFER
