@@ -133,6 +133,7 @@ lcd_init_seq_stu st7305_init_table[] = {
     {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X12, 0X0A}}, // VGH=15V VGL=-7.5V
 
 // 电压设置 起始
+    // VSHPCTRL (Source High Positive Voltage Control )
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xC1}},
     {LCD_CTRL_WRITE_DATA, 4, (const uint8_t []){0x3C, 0x3E, 0x3C, 0x3C}},
    
@@ -147,14 +148,15 @@ lcd_init_seq_stu st7305_init_table[] = {
 // 电压设置 结束
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xD8}},
-    // {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X80, 0XE9}}, // HPM=51Hz
-    {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0XA6, 0XE9}}, // HPM=32Hz
-    // {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X26, 0XE9}}, // 关闭 osc
+    // {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X80, 0XE9}}, // HPM=25.5/51Hz
+    // {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0XA6, 0XE9}}, // HPM=16/32Hz
+    {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X26, 0XE9}}, // 关闭 osc
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xB2}}, // Frame Rate Control
-    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X15}}, //
-    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X05}}, // 高功耗下 16/25.5 Hz，低功耗下 8Hz
-    {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X00}}, // 高功耗下 16/25.5 Hz，低功耗下 0.25Hz
+    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X15}}, // 高功耗下 32/51 Hz，低功耗下 8Hz
+    {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X05}}, // 高功耗下 16/25.5 Hz，低功耗下 8Hz，不知道为什么改啥都是 8Hz
+    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X00}}, // 高功耗下 16/25.5 Hz，低功耗下 0.25Hz
+    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X10}}, // 高功耗下 32/51 Hz，低功耗下 0.25Hz
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xB3}}, // Update Period Gate EQ Control in HPM
     {LCD_CTRL_WRITE_DATA, 10, (const uint8_t []){0XE5, 0XF6, 0X17, 0X77, 0X77, 0X77, 0X77, 0X77, 0X77, 0X71}}, //
@@ -198,15 +200,15 @@ lcd_init_seq_stu st7305_init_table[] = {
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x2B}}, // Row Address Setting
     {LCD_CTRL_WRITE_DATA, 2, (const uint8_t []){0X00, 0X7C}},
 
-    // {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x35}}, // TE
-    // {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X00}}, //
-    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x34}}, // TE off
+    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x35}}, // TE
+    {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0X00}}, //
+    // {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x34}}, // TE off
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xD0}}, // Auto power down
     {LCD_CTRL_WRITE_DATA, 1, (const uint8_t []){0XFF}}, //
 
 
-    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x38}}, // 0x39 low power 0x38 high power
+    {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0x39}}, // 0x39 low power 0x38 high power
     {LCD_CTRL_DELAY, 20}, // 延时 20 ms
 
     {LCD_CTRL_WRITE_CMD, 1, (const uint8_t []){0xBB}},

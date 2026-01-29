@@ -42,6 +42,21 @@ void param_write_tick_dance_period(struct param_stu *param, const char *new_val)
     LTX_LOG_INFO("Set tick dance period to %d ms\n", task_tick_dance.timer.tick_reload);
 }
 
+extern TickType_t high_power_delay;
+void param_read_high_power_delay(struct param_stu *param){
+    LTX_LOG_INFO("high_power_delay: %d ms\n", high_power_delay);
+}
+
+void param_write_high_power_delay(struct param_stu *param, const char *new_val){
+
+    uint32_t new_ms;
+
+    sscanf(new_val, "%d", &new_ms);
+    high_power_delay = new_ms;
+
+    LTX_LOG_INFO("Set high_power_delay to %d ms\n", high_power_delay);
+}
+
 struct param_stu param_list[] = {
     { // 心拍任务频率
         .param_name = "heart_beat_Hz",
@@ -53,6 +68,12 @@ struct param_stu param_list[] = {
         .param_name = "tick_dance_period",
         .param_read = param_read_tick_dance_period,
         .param_write = param_write_tick_dance_period,
+    },
+
+    { // 切换高功耗后的延时时间
+        .param_name = "high_power_delay",
+        .param_read = param_read_high_power_delay,
+        .param_write = param_write_high_power_delay,
     },
 
     // 末尾项

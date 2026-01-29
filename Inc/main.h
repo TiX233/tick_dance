@@ -52,6 +52,8 @@ extern RTC_HandleTypeDef hrtc_handler;
 
 extern struct ltx_Lock_stu lock_debounce;
 
+extern struct ltx_Topic_stu topic_te;
+
 /* Exported functions prototypes ---------------------------------------------*/
 void APP_ErrorHandler(void);
 

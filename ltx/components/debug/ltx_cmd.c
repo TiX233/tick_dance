@@ -29,6 +29,8 @@ void cmd_cb_draw_unit(uint8_t argc, char *argv[]);
 void cmd_cb_rtc_get(uint8_t argc, char *argv[]);
 void cmd_cb_rtc_set(uint8_t argc, char *argv[]);
 
+void cmd_cb_frame_low_rate(uint8_t argc, char *argv[]);
+
 ltx_Cmd_item cmd_list[] = {
     {
         .cmd_name = "echo",
@@ -99,6 +101,12 @@ ltx_Cmd_item cmd_list[] = {
         .cmd_name = "rtc_set",
         .brief = "set rtc date and time",
         .cmd_cb = cmd_cb_rtc_set,
+    },
+    
+    {
+        .cmd_name = "frame_low_rate",
+        .brief = "set or get frame rate in low power",
+        .cmd_cb = cmd_cb_frame_low_rate,
     },
 
 
@@ -708,3 +716,60 @@ void cmd_cb_rtc_set(uint8_t argc, char *argv[]){
 Useage_rtc_set:
     LTX_LOG_INFO("Useage: %s <date/time> <year/hour> <month/minute> <date/second>\n", argv[0]);
 }
+
+
+// 设置低帧率模式下刷新率，暂时用不了
+void cmd_cb_frame_low_rate(uint8_t argc, char *argv[]){
+    static char default_rate = 5;
+
+    if(argc < 2){
+        goto Useage_frame_low_rate;
+    }
+
+    const char *low_rate_list[] = {
+        "0.25",
+        "0.5",
+        "1",
+        "2",
+        "4",
+        "8",
+    };
+
+    switch(argv[1][1]){
+        case 'g':
+            LTX_LOG_INFO("rate now: %c: %s Hz\n", default_rate + 'a', low_rate_list[default_rate]);
+            break;
+
+        case 's':
+            if(argc < 3){
+                goto Useage_frame_low_rate;
+            }
+            if(argv[2][0] > 'f' || argv[2][0] < 'a'){
+                LTX_LOG_WARN("rate not in range(a~f)!\n");
+                goto Useage_frame_low_rate;
+            }
+            default_rate = argv[2][0] - 'a';
+            st7305_write_cmd(&myLCD, 0xB2);
+            st7305_write_data(&myLCD, &default_rate, 1);
+
+            LTX_LOG_INFO("Set rate to: %c: %s Hz\n", default_rate + 'a', low_rate_list[default_rate]);
+
+            break;
+
+        default:
+            goto Useage_frame_low_rate;
+            break;
+    }
+
+    return ;
+Useage_frame_low_rate:
+    LTX_LOG_INFO("Useage: %s <-set/-get> [new_rate(a~f)]\n", argv[0]);
+    LTX_LOG_INFO("rate:\n");
+    LTX_LOG_INFO("\ta: 0.25 Hz\n");
+    LTX_LOG_INFO("\tb: 0.5 Hz\n");
+    LTX_LOG_INFO("\tc: 1 Hz\n");
+    LTX_LOG_INFO("\td: 2 Hz\n");
+    LTX_LOG_INFO("\te: 4 Hz\n");
+    LTX_LOG_INFO("\tf: 8 Hz\n");
+}
+

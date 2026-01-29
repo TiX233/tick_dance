@@ -67,28 +67,39 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
         HAL_SYSCFG_DMA_Req(1);         /* SPI1_TX DMA_CH1 */
         // HAL_SYSCFG_DMA_Req(0x200);                      /* SPI1_RX DMA_CH2 */
 
-        // rst
+        // TE
         GPIO_InitStruct.Pin = GPIO_PIN_11;
-        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, 0);
+
+        /* Enable EXTI interrupt */
+        // HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
+        // HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+
+        // rst
+        GPIO_InitStruct.Pin = GPIO_PIN_4;
+        GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+        GPIO_InitStruct.Pull = GPIO_NOPULL;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, 0);
 
         // d/c
-        GPIO_InitStruct.Pin = GPIO_PIN_4;
+        GPIO_InitStruct.Pin = GPIO_PIN_5;
         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
         /* SPI NSS*/
-        GPIO_InitStruct.Pin = GPIO_PIN_5;
+        GPIO_InitStruct.Pin = GPIO_PIN_7;
         GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, 1);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, 1);
 
         /* SPI SCK GPIO pin configuration  */
         GPIO_InitStruct.Pin = GPIO_PIN_2;

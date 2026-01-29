@@ -11,12 +11,19 @@
 #include "num_trans.h"
 #include "colon_trans.h"
 
+// 开启这个宏则表示用显示屏 TE 信号来跳动，避免撕裂，不开则用软件定时器来跳动
+#define DANCE_BY_TE
+
 // 时间跳动偏移定时任务
 struct ltx_Task_stu task_tick_dance;
 void task_cb_tick_dance(void *param);
 // 时间跳动需要更新显示话题
+#ifdef DANCE_BY_TE
+struct ltx_Topic_stu *topic_time_need_dance = &(topic_te); // 使用显示屏刷新同步信号触发跳动
+#else
 // struct ltx_Topic_stu topic_time_need_dance = _LTX_TOPIC_DEAFULT_CONFIG(topic_time_need_dance);
 struct ltx_Topic_stu *topic_time_need_dance = &(task_tick_dance.timer.topic); // 不额外创建话题，直接用 task 自己的 topic
+#endif
 
 // 单帧发送完成话题
 // struct ltx_Topic_stu topic_draw_frame_over = _LTX_TOPIC_DEAFULT_CONFIG(topic_draw_frame_over);
@@ -42,8 +49,14 @@ void script_cb_display_config_time_sub(struct ltx_Script_stu *script);
 // APP 相关
 int myAPP_display_init(struct ltx_App_stu *app){
     // 创建时间跳动定时器
-    ltx_Task_init(&task_tick_dance, task_cb_tick_dance, 200, 0);
+    ltx_Task_init(&task_tick_dance, task_cb_tick_dance, 125, 0);
+    
+#ifdef DANCE_BY_TE
+    // 不使用软件定时器而是使用显示屏 TE 信号来更新跳动
+    ltx_Topic_subscribe(&topic_te, &(task_tick_dance.subscriber));
+#else
     ltx_Task_add_to_app(&task_tick_dance, app, "tick_dance");
+#endif
 
 
     // 创建显示管理脚本
@@ -101,13 +114,15 @@ struct ltx_App_stu app_display = {
 uint8_t dance_offset = 0;
 // 时间跳动定时任务
 void task_cb_tick_dance(void *param){
-    // 每 200ms 自增一次偏移
+    // 每 125ms 自增一次偏移
     dance_offset = (dance_offset+1)%3;
     // 时间需要跳动，发布话题要求更新显示
     // ltx_Topic_publish(&topic_time_need_dance);
     // 不额外创建话题发布，直接用 task 自己的 topic
 }
 
+TickType_t high_power_delay = 50;
+uint8_t low_power_frame_rate_data = 0;
 static RTC_TimeTypeDef rtc_time = {
     .Hours = 0,
     .Minutes = 0,
@@ -118,25 +133,16 @@ void script_cb_display_time(struct ltx_Script_stu *script){
 
     if(ltx_Script_get_triger_type(script) == SC_TRIGER_RESET){ // 外部要求此脚本复位，可在此处做释放资源等操作
         HAL_SPI_DMAStop(&hspi1_handler);
-        // st7305_power_high(&myLCD); // 显示屏进高功耗，提高刷新率
         return ;
     }
 
     switch(script->step_now){
         case 0:
-            st7305_power_low(&myLCD); // 显示屏进低功耗，降低刷新率
-            ltx_Script_next_step_topic(script, 20, 0, topic_time_need_dance); // 以 TickType_t 最大值等待时间需要跳动定时器触发，触发后再更新显示
-
-            break;
-
-        case 20:
-            st7305_power_high(&myLCD); // 显示屏进高功耗，提高刷新率
-            ltx_Script_next_step_delay(script, 1, 50); // 进高功耗后等一段时间再开始刷屏
+            ltx_Script_next_step_topic(script, 1, 0, topic_time_need_dance); // 以 TickType_t 最大值等待时间需要跳动定时器触发，触发后再更新显示
 
             break;
 
         case 1: // 显示小时十位
-            st7305_power_high(&myLCD); // 显示屏进高功耗，提高刷新率
 
             HAL_RTC_GetTime(&hrtc_handler, &rtc_time, RTC_FORMAT_BIN);
 

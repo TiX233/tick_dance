@@ -46,7 +46,11 @@ DMA_HandleTypeDef hdmaCh1_handler;
 
 RTC_HandleTypeDef hrtc_handler;
 
+// 消抖闹钟
 struct ltx_Lock_stu lock_debounce;
+
+// 屏幕同步信号
+struct ltx_Topic_stu topic_te = _LTX_TOPIC_DEAFULT_CONFIG(topic_te);
 
 /* Private user code ---------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -91,7 +95,7 @@ int main(void)
 
 
     // 启动调度器
-    #ifndef USE_IDLE_SLEEP
+    #ifndef ltx_cfg_USE_IDLE_TASK
     LTX_LOG_INFO("Start scheduler...\n");
     ltx_Sys_scheduler();
     #endif

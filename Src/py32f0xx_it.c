@@ -213,12 +213,21 @@ void EXTI2_3_IRQHandler(void){
 #endif
 
 void EXTI4_15_IRQHandler(void){
-    // 消抖闹钟
-    // 用锁来代替，因为锁有超时回调，而且 v2 版本配置闹钟太麻烦了
-    ltx_Lock_locked(&lock_debounce, 15);
+    if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_11)){ // TE
+        // 发布 TE 事件
+        ltx_Topic_publish(&topic_te);
+        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_11);
+    }
 
-    // 清除中断标志位，感觉对于按键放在最后会不会更好一点，上面内点代码耗时也能消点抖
-    __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_6);
+    if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_6)){ // 按键 B
+        // 消抖闹钟
+        // 用锁来代替，因为锁有超时回调，而且 v2 版本配置闹钟太麻烦了
+        ltx_Lock_locked(&lock_debounce, 15);
+
+        // 清除中断标志位，感觉对于按键放在最后会不会更好一点，上面内点代码耗时也能消点抖
+        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_6);
+    }
+
 }
 
 
